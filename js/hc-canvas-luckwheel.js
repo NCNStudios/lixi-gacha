@@ -74,13 +74,39 @@
         events();
     }
 
-    let audio = new Audio('sound/ticktick.mp3');
+    let audio = new Audio('sound/ticktick12s.mp3');
+    let bgMusicState = false;
 
     function playSound() {
         audio.pause();
         audio.currentTime = 0;
         audio.volume = 0.7;
         audio.play();
+
+        if (!bgMusicState) {
+            let bgNum = 1;
+            let bgAudio = localStorage.getItem("spinBgAudio");
+            if (bgAudio == null) {
+                bgAudio = 1;
+                localStorage.setItem("spinBgAudio", 1);
+            } else {
+                bgNum = Number(bgAudio);
+            }
+            let audioBg = new Audio('sound/' + bgNum + '.mp3');
+            audioBg.pause();
+            audioBg.currentTime = 0;
+            audioBg.volume = 1;
+            audioBg.play();
+            bgMusicState = true;
+            bgNum++;
+            if (bgNum > 9) {
+                bgNum = 1;
+            }
+            localStorage.setItem("spinBgAudio", bgNum);
+            audioBg.onended = function() {
+                bgMusicState = false;
+            };
+        }
     }
 
     /**
@@ -135,8 +161,8 @@
             html.push('<li class="hc-luckywheel-item"> <span style="');
             html.push(transform + ": rotate(" + i * turnNum + 'turn)">');
             if (opts.mode == "both") {
-                html.push("<p id='curve'>" + prizeList[i].text + "</p>");
                 html.push('<img src="' + prizeList[i].img + '" />');
+                html.push("<p id='curve'>" + prizeList[i].text + "</p>");
             } else if (prizeList[i].img) {
                 html.push('<img src="' + prizeList[i].img + '" />');
             } else {
@@ -163,7 +189,6 @@
      * @return {[type]}     [description]
      */
     function runRotate(deg) {
-        console.log(deg);
         // runInit();
         // setTimeout(function() {
         container.style[transform] = "rotate(" + deg + "deg)";
@@ -175,24 +200,30 @@
      */
     function events() {
         bind(btn, "click", function() {
+            let counter = 0;
 
-            console.log("a");
-            playSound();
-            addClass(btn, "disabled");
+            const intervalId = setInterval(function() {
+                playSound();
+                addClass(btn, "disabled");
 
-            fnGetPrize(function(data) {
-                if (data[0] == null && !data[1] == null) {
-                    return;
+                fnGetPrize(function(data) {
+                    if (data[0] == null && !data[1] == null) {
+                        return;
+                    }
+                    optsPrize = {
+                        prizeId: data[0],
+                        chances: data[1]
+                    };
+                    deg = deg || 0;
+                    deg = deg + (360 - (deg % 360)) + (360 * 10 - data[0] * (360 / num));
+                    runRotate(deg);
+                });
+                bind(container, transitionEnd, eGot);
+                counter++;
+                if (counter === 3) {
+                    clearInterval(intervalId);
                 }
-                optsPrize = {
-                    prizeId: data[0],
-                    chances: data[1]
-                };
-                deg = deg || 0;
-                deg = deg + (360 - (deg % 360)) + (360 * 10 - data[0] * (360 / num));
-                runRotate(deg);
-            });
-            bind(container, transitionEnd, eGot);
+            }, 500);
         });
     }
 

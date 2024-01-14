@@ -7,6 +7,7 @@
     <title>Mit Lixi</title>
     <link rel="stylesheet" href="css/typo/typo.css" />
     <link rel="stylesheet" href="css/hc-canvas-luckwheel.css" />
+    <link rel="stylesheet" href="libs/unimodal/unimodal.css" />
     <style>
         .hc-luckywheel {
             position: fixed;
@@ -20,9 +21,8 @@
 
 <body>
     <video playsinline autoplay muted loop poster="polina.jpg" id="bgvid">
-      <source src="images/bg3.mp4" type="video/mp4" />
+      <source src="images/bg4.mp4" type="video/mp4" />
     </video>
-    <div class="lixine"></div>
     <div class="wrapper typo" id="wrapper">
         <section id="luckywheel" class="hc-luckywheel">
             <div class="hc-luckywheel-container">
@@ -35,57 +35,32 @@
         </section>
     </div>
     <div class="withlove"></div>
-    <button id="mnu">
-      <i class="bi bi-three-dots"></i>
-    </button>
-    <div class="mnuModal">
-        <div class="musicController">
-            <button class="btn" id="playBgMusic">
-                <i class="bi bi-play-fill"></i>
-            </button>
-            <button class="btn" id="stopBgMusic">
-                <i class="bi bi-stop-fill"></i>
-            </button>
-            <button class="btn" id="prevBgMusic">
-                <i class="bi bi-caret-left-fill"></i>
-            </button>
-            <button class="btn" id="nextBgMusic">
-                <i class="bi bi-caret-right-fill"></i>
-            </button>
-            <input type="range" class="slider" id="bgVolume" value="30" maxlength="100">
-        </div>
-        <input type="range" class="musicProgressSlider" id="musicProgressSlider" value="0" maxlength="100">
-    </div>
-    <div class="modalBg"></div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script src="js/hc-canvas-luckwheel.js"></script>
+    <script src="libs/unimodal/unimodal.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $(".mnuModal").hide();
-            $(".modalBg").hide();
-        });
         var isPercentage = true;
         var prizes = [{
-            text: "Áo thun J2Team",
-            img: "images/Ao.png",
-            percentpage: 0, // 1%
+            text: "500k",
+            img: "images/500k.png",
+            percentpage: 0.005,
         }, {
-            text: "Nón J2 Team",
-            img: "images/Non.png",
-            percentpage: 100, // 5%
+            text: "200k",
+            img: "images/200k.png",
+            percentpage: 0.15,
         }, {
-            text: "Vòng Tay J2Team",
-            img: "images/Vong.png",
-            percentpage: 0, // 10%
+            text: "100k",
+            img: "images/100k.png",
+            percentpage: 0.3,
         }, {
-            text: "J2Team Security",
-            img: "images/j2_logo.png",
-            percentpage: 0, // 24%
+            text: "50k",
+            img: "images/50k.png",
+            percentpage: 0.58,
         }, {
-            text: "Chúc bạn may mắn lần sau",
-            img: "images/miss.png",
-            percentpage: 0, // 60%
-        }, ];
+            text: "20k",
+            img: "images/20k.png",
+            percentpage: 0.01,
+        }];
         document.addEventListener(
             "DOMContentLoaded",
             function() {
@@ -112,7 +87,10 @@
                             Swal.fire("Bạn không trúng thưởng", data, "error");
                             playEndSound();
                         } else {
-                            Swal.fire("Đã trúng giải", data, "success");
+                            // Swal.fire("Đã trúng giải", data, "success");
+                            Swal.fire({
+                                template: "#my-template"
+                            });
                             playEndSound();
                         }
                     },
@@ -202,100 +180,6 @@
             audioClapEnd.volume = 0.1;
             audioClapEnd.play();
         }
-
-        // Play background music
-        let max = 2;
-        let currentSong = Math.floor(Math.random() * max) + 1;
-        let audioBg = new Audio('sound/bg' + currentSong + '.mp3');
-        let musicProgressSlider = $('#musicProgressSlider');
-        let bgMusicState = false;
-        let bgMusicVol = 0.3;
-        $("#playBgMusic").click(function() {
-            $(audioBg).on('timeupdate', function() {
-                const currentTime = audioBg.currentTime;
-                const duration = audioBg.duration;
-                const percentage = (currentTime / duration) * 100;
-
-                musicProgressSlider.val(percentage);
-            });
-
-            $(audioBg).on('ended', function() {
-                $("#nextBgMusic").click();
-            });
-
-            if (!bgMusicState) {
-                audioBg.volume = bgMusicVol;
-                audioBg.play();
-                bgMusicState = true;
-                $(this).find('i').removeClass('bi-play-fill').addClass('bi-pause-fill');
-            } else {
-                audioBg.pause();
-                bgMusicState = false;
-                $(this).find('i').removeClass('bi-pause-fill').addClass('bi-play-fill');
-            }
-        });
-        $("#bgVolume").on("input", function(event, ui) {
-            let vol = $(this).val() / 100;
-            bgMusicVol = vol;
-            audioBg.volume = vol;
-        });
-        musicProgressSlider.on('input', function() {
-            const selectedTime = (this.value * audioBg.duration) / 100;
-            audioBg.currentTime = selectedTime;
-        });
-        $("#stopBgMusic").click(function() {
-            audioBg.pause();
-            audioBg.currentTime = 0;
-            musicProgressSlider.val(0);
-            bgMusicState = false;
-            $("#playBgMusic").find('i').removeClass('bi-pause-fill').addClass('bi-play-fill');
-        });
-        $("#prevBgMusic").click(function() {
-            $("#stopBgMusic").click();
-            if (currentSong - 1 < 1) {
-                audioBg = new Audio('sound/bg' + max + '.mp3');
-                currentSong = max;
-                $("#playBgMusic").click();
-            } else {
-                currentSong = currentSong - 1;
-                audioBg = new Audio('sound/bg' + currentSong + '.mp3');
-                $("#playBgMusic").click();
-            }
-        });
-        $("#nextBgMusic").click(function() {
-            $("#stopBgMusic").click();
-            if (currentSong + 1 > max) {
-                audioBg = new Audio('sound/bg1.mp3');
-                currentSong = 1;
-                $("#playBgMusic").click();
-            } else {
-                currentSong = currentSong + 1;
-                audioBg = new Audio('sound/bg' + currentSong + '.mp3');
-                $("#playBgMusic").click();
-            }
-        });
-
-        // Open menu
-        let mnuState = false;
-
-        $("#mnu").click(function() {
-            if (!mnuState) {
-                $(".mnuModal").fadeIn(200);
-                $(".modalBg").fadeIn(200);
-                mnuState = true;
-            } else {
-                $(".mnuModal").fadeOut(200);
-                $(".modalBg").fadeOut(200);
-                mnuState = false;
-            }
-        });
-        $(".modalBg").click(function() {
-            if (mnuState) {
-                $(".mnuModal").fadeOut(200);
-                $(".modalBg").fadeOut(200);
-                mnuState = false;
-            }
-        });
     </script>
 </body>
 

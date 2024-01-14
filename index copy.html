@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mit Lixi</title>
+    <link rel="stylesheet" href="css/typo/typo.css" />
+    <link rel="stylesheet" href="css/hc-canvas-luckwheel.css" />
+    <style>
+        .hc-luckywheel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <video playsinline autoplay muted loop poster="polina.jpg" id="bgvid">
+      <source src="images/bg4.mp4" type="video/mp4" />
+    </video>
+    <div class="wrapper typo" id="wrapper">
+        <section id="luckywheel" class="hc-luckywheel">
+            <div class="hc-luckywheel-container">
+                <canvas class="hc-luckywheel-canvas" width="500px" height="500px">Vòng Xoay May Mắn</canvas>
+            </div>
+            <div class="hc-luckywheel-overlay">
+                <div class="hc-luckywheel-btn">Chơi</div>
+            </div>
+
+        </section>
+    </div>
+    <div class="withlove"></div>
+    <button id="mnu">
+      <i class="bi bi-three-dots"></i>
+    </button>
+    <div class="mnuModal">
+        <div class="musicController">
+            <button class="btn" id="playBgMusic">
+                <i class="bi bi-play-fill"></i>
+            </button>
+            <button class="btn" id="stopBgMusic">
+                <i class="bi bi-stop-fill"></i>
+            </button>
+            <button class="btn" id="prevBgMusic">
+                <i class="bi bi-caret-left-fill"></i>
+            </button>
+            <button class="btn" id="nextBgMusic">
+                <i class="bi bi-caret-right-fill"></i>
+            </button>
+            <input type="range" class="slider" id="bgVolume" value="30" maxlength="100">
+        </div>
+        <input type="range" class="musicProgressSlider" id="musicProgressSlider" value="0" maxlength="100">
+    </div>
+    <div class="modalBg"></div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="js/hc-canvas-luckwheel.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".mnuModal").hide();
+            $(".modalBg").hide();
+        });
+        var isPercentage = true;
+        var prizes = [{
+            text: "500k",
+            img: "images/500k.png",
+            percentpage: 0.005,
+        }, {
+            text: "200k",
+            img: "images/200k.png",
+            percentpage: 0.15,
+        }, {
+            text: "100k",
+            img: "images/100k.png",
+            percentpage: 0.3,
+        }, {
+            text: "50k",
+            img: "images/50k.png",
+            percentpage: 0.58,
+        }, {
+            text: "20k",
+            img: "images/20k.png",
+            percentpage: 0.01,
+        }];
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+                hcLuckywheel.init({
+                    id: "luckywheel",
+                    config: function(callback) {
+                        callback && callback(prizes);
+                    },
+                    mode: "both",
+                    getPrize: function(callback) {
+                        var rand = randomIndex(prizes);
+                        var chances = rand;
+                        callback && callback([rand, chances]);
+                    },
+                    gotBack: function(data) {
+                        if (data == null) {
+                            Swal.fire(
+                                "Chương trình kết thúc",
+                                "Đã hết phần thưởng",
+                                "error"
+                            );
+                            playEndSound();
+                        } else if (data == "Chúc bạn may mắn lần sau") {
+                            Swal.fire("Bạn không trúng thưởng", data, "error");
+                            playEndSound();
+                        } else {
+                            // Swal.fire("Đã trúng giải", data, "success");
+                            Swal.fire({
+                                template: "#my-template"
+                            });
+                            playEndSound();
+                        }
+                    },
+                });
+            },
+            false
+        );
+
+        function randomIndex(prizes) {
+            if (isPercentage) {
+                var counter = 1;
+                for (let i = 0; i < prizes.length; i++) {
+                    if (prizes[i].number == 0) {
+                        counter++;
+                    }
+                }
+                if (counter == prizes.length) {
+                    return null;
+                }
+                let rand = Math.random();
+                let prizeIndex = null;
+                switch (true) {
+                    case rand < prizes[4].percentpage:
+                        prizeIndex = 4;
+                        break;
+                    case rand < prizes[4].percentpage + prizes[3].percentpage:
+                        prizeIndex = 3;
+                        break;
+                    case rand <
+                    prizes[4].percentpage +
+                    prizes[3].percentpage +
+                    prizes[2].percentpage:
+                        prizeIndex = 2;
+                        break;
+                    case rand <
+                    prizes[4].percentpage +
+                    prizes[3].percentpage +
+                    prizes[2].percentpage +
+                    prizes[1].percentpage:
+                        prizeIndex = 1;
+                        break;
+                    case rand <
+                    prizes[4].percentpage +
+                    prizes[3].percentpage +
+                    prizes[2].percentpage +
+                    prizes[1].percentpage +
+                    prizes[0].percentpage:
+                        prizeIndex = 0;
+                        break;
+                }
+                if (prizes[prizeIndex].number != 0) {
+                    prizes[prizeIndex].number = prizes[prizeIndex].number - 1;
+                    return prizeIndex;
+                } else {
+                    return randomIndex(prizes);
+                }
+            } else {
+                var counter = 0;
+                for (let i = 0; i < prizes.length; i++) {
+                    if (prizes[i].number == 0) {
+                        counter++;
+                    }
+                }
+                if (counter == prizes.length) {
+                    return null;
+                }
+                var rand = (Math.random() * prizes.length) >>> 0;
+                if (prizes[rand].number != 0) {
+                    prizes[rand].number = prizes[rand].number - 1;
+                    return rand;
+                } else {
+                    return randomIndex(prizes);
+                }
+            }
+        }
+        let audioEnd = new Audio('sound/nmvv.mp3');
+        let audioClapEnd = new Audio('sound/clap.mp3');
+
+        // Play end sound
+        function playEndSound() {
+            audioEnd.pause();
+            audioEnd.currentTime = 0;
+            audioEnd.volume = 0.6;
+            audioEnd.play();
+            audioClapEnd.pause();
+            audioClapEnd.currentTime = 0;
+            audioClapEnd.volume = 0.1;
+            audioClapEnd.play();
+        }
+
+        // Play background music
+        let max = 2;
+        let currentSong = Math.floor(Math.random() * max) + 1;
+        let audioBg = new Audio('sound/bg' + currentSong + '.mp3');
+        let musicProgressSlider = $('#musicProgressSlider');
+        let bgMusicState = false;
+        let bgMusicVol = 0.3;
+        $("#playBgMusic").click(function() {
+            $(audioBg).on('timeupdate', function() {
+                const currentTime = audioBg.currentTime;
+                const duration = audioBg.duration;
+                const percentage = (currentTime / duration) * 100;
+
+                musicProgressSlider.val(percentage);
+            });
+
+            $(audioBg).on('ended', function() {
+                $("#nextBgMusic").click();
+            });
+
+            if (!bgMusicState) {
+                audioBg.volume = bgMusicVol;
+                audioBg.play();
+                bgMusicState = true;
+                $(this).find('i').removeClass('bi-play-fill').addClass('bi-pause-fill');
+            } else {
+                audioBg.pause();
+                bgMusicState = false;
+                $(this).find('i').removeClass('bi-pause-fill').addClass('bi-play-fill');
+            }
+        });
+        $("#bgVolume").on("input", function(event, ui) {
+            let vol = $(this).val() / 100;
+            bgMusicVol = vol;
+            audioBg.volume = vol;
+        });
+        musicProgressSlider.on('input', function() {
+            const selectedTime = (this.value * audioBg.duration) / 100;
+            audioBg.currentTime = selectedTime;
+        });
+        $("#stopBgMusic").click(function() {
+            audioBg.pause();
+            audioBg.currentTime = 0;
+            musicProgressSlider.val(0);
+            bgMusicState = false;
+            $("#playBgMusic").find('i').removeClass('bi-pause-fill').addClass('bi-play-fill');
+        });
+        $("#prevBgMusic").click(function() {
+            $("#stopBgMusic").click();
+            if (currentSong - 1 < 1) {
+                audioBg = new Audio('sound/bg' + max + '.mp3');
+                currentSong = max;
+                $("#playBgMusic").click();
+            } else {
+                currentSong = currentSong - 1;
+                audioBg = new Audio('sound/bg' + currentSong + '.mp3');
+                $("#playBgMusic").click();
+            }
+        });
+        $("#nextBgMusic").click(function() {
+            $("#stopBgMusic").click();
+            if (currentSong + 1 > max) {
+                audioBg = new Audio('sound/bg1.mp3');
+                currentSong = 1;
+                $("#playBgMusic").click();
+            } else {
+                currentSong = currentSong + 1;
+                audioBg = new Audio('sound/bg' + currentSong + '.mp3');
+                $("#playBgMusic").click();
+            }
+        });
+
+        // Open menu
+        let mnuState = false;
+
+        $("#mnu").click(function() {
+            if (!mnuState) {
+                $(".mnuModal").fadeIn(200);
+                $(".modalBg").fadeIn(200);
+                mnuState = true;
+            } else {
+                $(".mnuModal").fadeOut(200);
+                $(".modalBg").fadeOut(200);
+                mnuState = false;
+            }
+        });
+        $(".modalBg").click(function() {
+            if (mnuState) {
+                $(".mnuModal").fadeOut(200);
+                $(".modalBg").fadeOut(200);
+                mnuState = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
