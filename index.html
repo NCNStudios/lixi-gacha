@@ -7,7 +7,10 @@
     <title>Mit Lixi</title>
     <link rel="stylesheet" href="css/typo/typo.css" />
     <link rel="stylesheet" href="css/hc-canvas-luckwheel.css" />
-    <link rel="stylesheet" href="libs/unimodal/unimodal.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
     <style>
         .hc-luckywheel {
             position: fixed;
@@ -35,32 +38,50 @@
         </section>
     </div>
     <div class="withlove"></div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="bgNoti"></div>
+            <div class="modal-body">
+                <p id="awards"></p>
+                <p class="congratulation">Chúc mừng chúc mừng</p>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script src="js/hc-canvas-luckwheel.js"></script>
-    <script src="libs/unimodal/unimodal.min.js"></script>
+    <script src="js/modal.js"></script>
     <script>
         var isPercentage = true;
-        var prizes = [{
+        var prizesRaw = [{
             text: "500k",
             img: "images/500k.png",
             percentpage: 0.005,
         }, {
             text: "200k",
             img: "images/200k.png",
-            percentpage: 0.15,
+            percentpage: 0.05,
         }, {
             text: "100k",
             img: "images/100k.png",
-            percentpage: 0.3,
+            percentpage: 0.2,
         }, {
             text: "50k",
             img: "images/50k.png",
-            percentpage: 0.58,
+            percentpage: 0.685,
         }, {
             text: "20k",
             img: "images/20k.png",
             percentpage: 0.01,
         }];
+        let prizes = [];
+        let localPrizes = localStorage.getItem("configContent");
+        if (localPrizes == null) {
+            prizes = prizesRaw;
+            localStorage.setItem("configContent", JSON.stringify(prizesRaw));
+        } else {
+            prizes = JSON.parse(localPrizes);
+        }
         document.addEventListener(
             "DOMContentLoaded",
             function() {
@@ -77,20 +98,13 @@
                     },
                     gotBack: function(data) {
                         if (data == null) {
-                            Swal.fire(
-                                "Chương trình kết thúc",
-                                "Đã hết phần thưởng",
-                                "error"
-                            );
+                            openModal(data);
                             playEndSound();
                         } else if (data == "Chúc bạn may mắn lần sau") {
-                            Swal.fire("Bạn không trúng thưởng", data, "error");
+                            openModal(data);
                             playEndSound();
                         } else {
-                            // Swal.fire("Đã trúng giải", data, "success");
-                            Swal.fire({
-                                template: "#my-template"
-                            });
+                            openModal(data);
                             playEndSound();
                         }
                     },

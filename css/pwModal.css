@@ -1,0 +1,139 @@
+.pwModal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.pwModalContent {
+    position: relative;
+    background-color: #f56462;
+    color: #fff;
+    margin: auto;
+    padding: 0;
+    border: 3px solid #dea812;
+    width: 90%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 10px;
+}
+
+.bgNoti {
+    background-image: url("/images/3.gif");
+    width: 100%;
+    height: 180px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    border-radius: 10px 10px 0 0;
+}
+
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pwModalBody {
+    padding: 2px 16px;
+}
+
+#awards {
+    text-align: center;
+    font-size: 60px;
+    font-family: 'Lobster', sans-serif;
+}
+
+.login {
+    text-align: center;
+    font-size: 22px;
+    font-family: 'Protest Strike', sans-serif;
+}
+
+.frmLogin {
+    font-family: 'Protest Strike', sans-serif;
+}
+
+.frmLogin .pwd {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1.5em;
+}
+
+.frmLogin .pwd label {
+    margin-right: 1em;
+    align-self: center;
+}
+
+.frmLogin .pwd input {
+    width: 100%;
+    height: 2em;
+    border-radius: 4px;
+    border: 0;
+    outline: none;
+    align-self: center;
+}
+
+.frmLogin .btnSubmit {
+    text-align: center;
+}
+
+.frmLogin #submit {
+    margin-bottom: 1.5em;
+    height: 3em;
+    border-radius: 4px;
+    border: 0;
+    outline: none;
+    background-color: #fff;
+    color: #f56462;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 0 1em;
+}
+
+#configContent {
+    display: none;
+}
+
+#prizes {
+    width: 98%;
+    height: 70vh;
+}

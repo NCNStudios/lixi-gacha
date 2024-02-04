@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mit Lixi Admin</title>
+    <link rel="stylesheet" href="/css/pwModal.css" />
+    <script src="/libs/bCrypt.js" type="text/javascript"></script>
+    <script src="/libs/jquery-3.7.1.min.js" type="text/javascript"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Protest+Strike&display=swap" rel="stylesheet">
+    <script type="text/javascript">
+        function verify() {
+            try {
+                checkpw(
+                    $("#password").val(),
+                    "$2a$05$ZTGiGoRLDKDG/Dujgmq1heIiLq.HraUgSfT60ZmizcnVS7vZKsaAC",
+                    function(res) {
+                        if (!res) {
+                            $(".login").text("Sai mật khẩu!");
+                            setTimeout(() => {
+                                $(".login").text("LOGIN");
+                            }, 2500);
+                        } else {
+                            closeModal();
+                            var configContent = document.getElementById("configContent");
+                            configContent.style.display = "block";
+                        }
+                    });
+            } catch (err) {
+                alert(err);
+                return;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="pwModal" class="pwModal">
+        <div class="pwModalContent">
+            <div class="bgNoti"></div>
+            <div class="pwModalBody">
+                <p class="login">LOGIN</p>
+                <form class="frmLogin" onsubmit='return false'>
+                    <div class="pwd">
+                        <label for="password">Password</label>
+                        <!-- <input size=30 type="password" name="password" id="password" autocomplete="off"></input> -->
+                        <input size=30 type="text" name="password" id="password"></input>
+                    </div>
+                    <div class="btnSubmit">
+                        <input type="button" name="button" value="Verify" onClick="verify()" id="submit" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="configContent">
+        <textarea id="prizes"></textarea>
+        <div class="btnSubmit">
+            <input type="button" value="Home" onClick="goHome()" />
+            <input type="button" value="Save" onClick="savePrizes()" />
+            <input type="button" value="Reset" onClick="resetPrizes()" />
+        </div>
+    </div>
+    <script src="/js/pwModal.js"></script>
+    <script>
+        var prizes = [{
+            text: "500k",
+            img: "images/500k.png",
+            percentpage: 0.005,
+        }, {
+            text: "200k",
+            img: "images/200k.png",
+            percentpage: 0.05,
+        }, {
+            text: "100k",
+            img: "images/100k.png",
+            percentpage: 0.2,
+        }, {
+            text: "50k",
+            img: "images/50k.png",
+            percentpage: 0.685,
+        }, {
+            text: "20k",
+            img: "images/20k.png",
+            percentpage: 0.01,
+        }];
+
+        $(document).ready(function() {
+            openModal();
+            let config = localStorage.getItem("configContent");
+            if (config == null) {
+                localStorage.setItem("configContent", JSON.stringify(prizes));
+            }
+            $("textarea#prizes").val(JSON.stringify(JSON.parse(config), null, 2));
+        });
+
+        function resetPrizes() {
+            localStorage.setItem("configContent", JSON.stringify(prizes));
+            $("textarea#prizes").val(JSON.stringify(prizes, null, 2));
+        }
+
+        function savePrizes() {
+            localStorage.setItem("configContent", $("textarea#prizes").val());
+            alert("Saved!");
+        }
+
+        function goHome() {
+            window.location.href = "/";
+        }
+    </script>
+</body>
+
+</html>
